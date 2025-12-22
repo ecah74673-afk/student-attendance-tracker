@@ -1,3 +1,5 @@
+//Hello~! It's Joy :D
+
 #include <iostream>
 #include <string>
 using namespace std;
@@ -8,7 +10,7 @@ int main() {
     cout << "Enter attendance sheet name: ";
     getline(cin, sheetName);
 
-    cout << "Attendance sheet \"" << sheetName 
+    cout << "Attendance sheet \"" << sheetName
          << "\" created successfully." << endl;
 
     return 0;
