@@ -37,6 +37,7 @@ int main() {
     string dataText[MAX_ROW][MAX_COL];
 
     int numCol = 0;
+    int addCol = 0;
     int rowCount = 0;
     char choice = 'y';
 
@@ -47,16 +48,18 @@ int main() {
     // STEP 1: Create attendance sheet
     cout << "Enter attendance sheet name: ";
     getline(cin, sheetName);    //I understand you are to remember the spaces and stuff
-    cout << "Attendance sheet \"" << sheetName << "\" created successfully.\n\n"; //Okay slashes are bcs "sheetname" but why
-                                                                                  //need "" in the first place? For the weird symbols?
-                                                                                  //Nvm. It's as in example output.
-
+    cout << "Attendance sheet \"" << sheetName << "\" created successfully.\n\n" << endl;; //Okay slashes are bcs "sheetname" but why
+                                                                                            //need "" in the first place? For the weird symbols?
+                                                                                            //Nvm. It's as in example output.
     // STEP 2: Define columns
     cout << "Define number of columns (max 10): ";
     cin >> numCol;
     cin.ignore();
 
-    while (numCol <= 0 || numCol > 10)     //A more immediate numCol limit checker
+    //Ask user if the number they typed is correct
+
+    //A more immediate numCol limit checker
+    while (numCol <= 0 || numCol > 10)
     {
         cout << "You have entered a number outside of our limit. Please enter another number." << endl;
         cout << "\nDefine number of columns (max 10): ";
@@ -75,7 +78,6 @@ int main() {
                 getline(cin, colType[i]);
             }
     }
-
     cout << "\nSheet structure created successfully.\n\n";
 
     // STEP 3 + 5: Insert multiple students
