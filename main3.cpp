@@ -15,6 +15,17 @@ bool isValidInt(string input) {
     return true;
 }
 
+//Validate TEXT input
+/*bool isValidText (int input)
+{
+    for (int d : input)
+    {
+        if (isdigit(d))
+            return false;
+    }
+    return true;
+} */
+
 //Trying a change to create a branch
 
 int main() {
@@ -22,7 +33,7 @@ int main() {
     string colName[MAX_COL];
     string colType[MAX_COL];
 
-    int dataInt[MAX_ROW][MAX_COL];
+    int dataInt[MAX_ROW][MAX_COL];      //I don't quite understand you
     string dataText[MAX_ROW][MAX_COL];
 
     int numCol = 0;
@@ -35,20 +46,34 @@ int main() {
 
     // STEP 1: Create attendance sheet
     cout << "Enter attendance sheet name: ";
-    getline(cin, sheetName);
-    cout << "Attendance sheet \"" << sheetName << "\" created successfully.\n\n";
+    getline(cin, sheetName);    //I understand you are to remember the spaces and stuff
+    cout << "Attendance sheet \"" << sheetName << "\" created successfully.\n\n"; //Okay slashes are bcs "sheetname" but why
+                                                                                  //need "" in the first place? For the weird symbols?
+                                                                                  //Nvm. It's as in example output.
 
     // STEP 2: Define columns
     cout << "Define number of columns (max 10): ";
     cin >> numCol;
     cin.ignore();
 
-    for (int i = 0; i < numCol; i++) {
-        cout << "Enter column " << i + 1 << " name: ";
-        getline(cin, colName[i]);
+    while (numCol <= 0 || numCol > 10)     //A more immediate numCol limit checker
+    {
+        cout << "You have entered a number outside of our limit. Please enter another number." << endl;
+        cout << "\nDefine number of columns (max 10): ";
+        cin >> numCol;
+        cin.ignore();
+    }
 
-        cout << "Enter column " << i + 1 << " type (INT/TEXT): ";
-        getline(cin, colType[i]);
+    if (numCol > 0 && numCol <= 10)
+    {
+        for (int i = 0; i < numCol; i++)
+            {
+                cout << "Enter column " << i + 1 << " name: ";
+                getline(cin, colName[i]);
+
+                cout << "Enter column " << i + 1 << " type (INT/TEXT): ";
+                getline(cin, colType[i]);
+            }
     }
 
     cout << "\nSheet structure created successfully.\n\n";
