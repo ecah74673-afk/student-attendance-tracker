@@ -16,24 +16,33 @@ bool isValidInt(string input) {
 }
 
 //Validate TEXT input
-/*bool isValidText (int input)
+bool isValidText (string input)
 {
-    for (int d : input)
+    for (char d : input)
     {
-        if (isdigit(d))
+        if (!isalpha(d) && d != ' ')
             return false;
     }
     return true;
-} */
+}
 
-//Trying a change to create a branch
+// Validate Status column input
+bool isValidStatus (string input)
+{
+    for (char e : input)
+    {
+        if (!isalnum(e) && e != ' ')
+            return false;
+    }
+    return true;
+}
 
 int main() {
     string sheetName;
     string colName[MAX_COL];
     string colType[MAX_COL];
 
-    int dataInt[MAX_ROW][MAX_COL];      //I don't quite understand you
+    int dataInt[MAX_ROW][MAX_COL];
     string dataText[MAX_ROW][MAX_COL];
 
     int numCol = 0;
@@ -47,36 +56,57 @@ int main() {
 
     // STEP 1: Create attendance sheet
     cout << "Enter attendance sheet name: ";
-    getline(cin, sheetName);    //I understand you are to remember the spaces and stuff
-    cout << "Attendance sheet \"" << sheetName << "\" created successfully.\n\n" << endl;; //Okay slashes are bcs "sheetname" but why
-                                                                                            //need "" in the first place? For the weird symbols?
-                                                                                            //Nvm. It's as in example output.
+    getline(cin, sheetName);
+    cout << "Attendance sheet \"" << sheetName << "\" created successfully.\n\n" << endl;;
+
     // STEP 2: Define columns
-    cout << "Define number of columns (max 10): ";
-    cin >> numCol;
-    cin.ignore();
+    string input;
 
-    //Ask user if the number they typed is correct
-
-    //A more immediate numCol limit checker
-    while (numCol <= 0 || numCol > 10)
+    while (true)
     {
-        cout << "You have entered a number outside of our limit. Please enter another number." << endl;
-        cout << "\nDefine number of columns (max 10): ";
-        cin >> numCol;
-        cin.ignore();
-    }
+        cout << "Define number of columns (max 10): ";
+        getline(cin, input);
 
-    if (numCol > 0 && numCol <= 10)
-    {
-        for (int i = 0; i < numCol; i++)
-            {
-                cout << "Enter column " << i + 1 << " name: ";
-                getline(cin, colName[i]);
+        //Check if input is integer
+        if (!isValidInt(input))
+        {
+            cout << "Invalid input. Please enter a number.\n";
+            continue;
+        }
 
-                cout << "Enter column " << i + 1 << " type (INT/TEXT): ";
-                getline(cin, colType[i]);
-            }
+        numCol = stoi(input);
+
+        //Check range
+        if (numCol <= 0 || numCol > 10)
+        {
+            cout << "You have entered a number outside of our limit. Please enter another number." << endl;
+            continue;
+        }
+
+        if (numCol > 0 && numCol <= 10)
+        {
+            for (int i = 0; i < numCol; i++)
+                {
+                    //Name the created column/s
+                    cout << "Enter column " << i + 1 << " name: ";
+                    getline(cin, colName[i]);
+
+                    //Check if colType is INT or TEXT only
+                    while (true)
+                        {
+                            cout << "Enter column " << i + 1 << " type (INT/TEXT): ";
+                            getline(cin, colType[i]);
+
+                            if (colType[i] == "INT" || colType[i] == "TEXT")
+                                    break;
+                            else
+                            {
+                                cout << "Invalid type. Please enter INT or TEXT only.\n";
+                            }
+                        }
+                }
+        }
+        break;
     }
     cout << "\nSheet structure created successfully.\n\n";
 
@@ -95,6 +125,7 @@ int main() {
                 cout << "Enter " << colName[j] << ": ";
                 cin >> input;
 
+                // Error handling for INT columns
                 if (!isValidInt(input)) {
                     cout << "Error: Invalid INT value. Please enter a number.\n";
                     j--;
@@ -104,15 +135,38 @@ int main() {
             }
 
             // TEXT columns
-            else {
-                if (colName[j] == "Status") {
+            else if (colType[j] == "TEXT")
+            {
+                string input;
+                bool valid;
+
+                //Check if column is called Status and implement specialty
+                if (colName[j] == "Status")
+                {
                     cout << "Enter Status (Present: 1, Absent: 0): ";
-                } else {
-                    cout << "Enter " << colName[j] << ": ";
+                    cin >> ws;  // FIX
+                    getline(cin, input);
+
+                    valid = (input == "0" || input == "1");
+                }
+                //For all other TEXT type columns
+                else
+                {
+                    cout << "Enter " << colName[j] <<": ";
+                    cin >> ws;  //FIX
+                    getline(cin, input);
+
+                    valid = isValidText(input);
                 }
 
-                cin >> ws; // FIX
-                getline(cin, dataText[rowCount][j]);
+                //Error handling for TEXT columns
+                if(!valid){
+                        cout << "Error: Invalid input for " << colName[j] << ".\n";
+                        j--;
+                }
+                else {
+                        dataText[rowCount][j] = input;
+                }
             }
         }
 
