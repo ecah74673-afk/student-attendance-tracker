@@ -120,19 +120,38 @@ int main() {
         for (int j = 0; j < numCol; j++) {
 
             // INT columns
-            if (colType[j] == "INT") {
+            if (colType[j] == "INT")
+            {
                 string input;
+                bool valid;
+
                 cout << "Enter " << colName[j] << ": ";
                 cin >> input;
 
-                // Error handling for INT columns
-                if (!isValidInt(input)) {
-                    cout << "Error: Invalid INT value. Please enter a number.\n";
-                    j--;
-                } else {
-                    dataInt[rowCount][j] = stoi(input);
+                if (colName[j] == "Status")
+                {
+                    //Status only allow 0 or 1
+                    valid = (input == "0" || input == "1");
+                    if (!valid)
+                        cout << "Error: Status must be 0 (Absent) or 1 (Present).\n";
                 }
-            }
+                else
+                {
+                    //Normal INT column error handling
+                    valid = isValidInt(input);
+                    if (!valid)
+                        cout << "Error: Invalid INT value. Please enter numbers only.\n";
+                }
+                // Error handling for INT columns
+                if (!valid)
+                    {
+                        j--;
+                    }
+                else
+                    {
+                        dataInt[rowCount][j] = stoi(input);
+                    }
+                    }
 
             // TEXT columns
             else if (colType[j] == "TEXT")
@@ -140,28 +159,16 @@ int main() {
                 string input;
                 bool valid;
 
-                //Check if column is called Status and implement specialty
-                if (colName[j] == "Status")
-                {
-                    cout << "Enter Status (Present: 1, Absent: 0): ";
-                    cin >> ws;  // FIX
-                    getline(cin, input);
+                //For TEXT type columns
+                cout << "Enter " << colName[j] <<": ";
+                cin >> ws;  //FIX
+                getline(cin, input);
 
-                    valid = (input == "0" || input == "1");
-                }
-                //For all other TEXT type columns
-                else
-                {
-                    cout << "Enter " << colName[j] <<": ";
-                    cin >> ws;  //FIX
-                    getline(cin, input);
-
-                    valid = isValidText(input);
-                }
+                valid = isValidText(input);
 
                 //Error handling for TEXT columns
                 if(!valid){
-                        cout << "Error: Invalid input for " << colName[j] << ".\n";
+                        cout << "Error: Invalid TEXT input. Please enter letters only.\n";
                         j--;
                 }
                 else {
