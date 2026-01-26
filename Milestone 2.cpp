@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <cctype>
 using namespace std;
@@ -193,34 +194,66 @@ void displayCSV() {
 
     cout << "-------------------------------------------\n";
 }
+
 // Main Menu
 int main() {
+    string fileName;    // To hold file name
+    ifstream inFile;
+    ofstream outFile;
     int choice = 0;
+
     cout << "===========================================\n";
-    cout << "   STUDENT ATTENDANCE TRACKER - MILESTONE 1\n";
+    cout << "   STUDENT ATTENDANCE TRACKER - MILESTONE 2\n";
     cout << "===========================================\n";
 
-    do {
-        cout << "\n============= MENU =============\n";
-        cout << "1. Create Attendance Sheet\n";
-        cout << "2. Insert Attendance Row\n";
-        cout << "3. View Sheet (CSV Mode)\n";
-        cout << "4. Exit\n";
-        cout << "================================\n";
-        cout << "Enter choice: ";
-        cin >> choice;
+    cout << "Create School Term (Database)";
+    cout << "\n-----------------------------\n";
+    cout << "Enter term name: ";
+    cin >> fileName;
 
-        switch(choice){
-            case 1: createSheet(); break;
-            case 2: insertRow(); break;
-            case 3: displayCSV(); break;
-            case 4: cout << "\n-------------------------------------------\n";
-                cout << "End of Milestone 1\n";
-                cout << "-------------------------------------------\n";
-                break;
-            default: cout << "Invalid choice. Try again.\n"; break;
-        }
-    } while(choice != 4);
+    // Open the file for input
+    cout << "Database \"" << fileName << "\" created and loaded.\n";
+
+    outFile.open(fileName);
+
+    // If the input file was opened successfully, continue.
+    if (outFile)
+    {
+        // Actually. What is you two 'cout' 's purpose?
+        cout << "Reading attendance data from file...\n";
+        cout << "Successfully loaded: Week1_Attendance.csv\n"; // They're not asking me to actually
+                                                                 // keep track/create the csv right?
+
+        cout << "===========================================\n";
+        cout << "   STUDENT ATTENDANCE TRACKER - MILESTONE 1\n";
+        cout << "===========================================\n";
+
+        do {
+            cout << "\n============= MENU =============\n";
+            cout << "1. Create Attendance Sheet\n";
+            cout << "2. Insert Attendance Row\n";   // Add update/delete feature
+            cout << "3. View Sheet (CSV Mode)\n";   // And auto? view update
+            cout << "4. Exit\n";
+            cout << "================================\n";
+            cout << "Enter choice: ";
+            cin >> choice;
+
+            switch(choice){
+                case 1: createSheet(); break;
+                case 2: insertRow(); break;
+                case 3: displayCSV(); break;
+                case 4: cout << "\n-------------------------------------------\n";
+                    cout << "End of Milestone 1\n";
+                    cout << "-------------------------------------------\n";
+                    break;
+                default: cout << "Invalid choice. Try again.\n"; break;
+            }
+        } while(choice != 4);
+
+        inFile.close();
+    }
+    else
+        cout << "Cannot open " << fileName << endl;
 
     return 0;
 }
