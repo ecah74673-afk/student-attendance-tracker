@@ -36,6 +36,12 @@ int numCol = 0;
 int rowCount = 0;
 bool sheetCreated = false;
 
+// Function prototypes
+void createSheet();
+void insertRow();
+void displayCSV();
+void saveToFile(const string &fileName);
+
 // Create attendance sheet
 void createSheet() {
     if(sheetCreated){
@@ -71,7 +77,7 @@ void createSheet() {
             getline(cin, colName[i]);
             if(colName[i].empty()) colName[i] = "Column" + to_string(i+1);
 
-            // **FOOLPROOF COLUMN TYPE INPUT**
+            // COLUMN TYPE INPUT
             while (true) {
                 cout << "Enter column " << i + 1 << " type (INT/TEXT): ";
                 getline(cin, colType[i]);
@@ -127,27 +133,29 @@ void insertRow() {
             } else { // TEXT
                 cin.ignore();
                 while(!valid){
-                    if(colName[j]=="Status"){
+                    /*if(colName[j]=="Status"){
                         cout << "Enter Status (Present: 1, Absent: 0): ";
                         getline(cin, input);
                         if(isValidStatus(input)){
                             dataText[rowCount][j] = input;
                             valid = true;
                         } else cout << "Error: Status must be 0 or 1.\n";
-                    } else {
-                        cout << "Enter " << colName[j] << ": ";
-                        getline(cin, input);
-                        if(isValidText(input)){
-                            dataText[rowCount][j] = input;
-                            valid = true;
-                        } else cout << "Error: Invalid text input.\n";
-                    }
+                    } else {*/
+                    cout << "Enter " << colName[j] << ": ";
+                    getline(cin, input);
+                    if(isValidText(input)){
+                        dataText[rowCount][j] = input;
+                        valid = true;
+                    } else cout << "Error: Invalid text input.\n";
                 }
             }
         }
 
         rowCount++;
         cout << "Row inserted successfully.\n";
+
+        // Save immediately after insertion
+        saveToFile(sheetName + ".csv");
 
         cout << "Add another student? (y/n): ";
         cin >> choice;
@@ -182,8 +190,8 @@ void displayCSV() {
         for(int j=0;j<numCol;j++){
             if(colType[j]=="INT")
                 cout << dataInt[i][j];
-            else if(colName[j]=="Status")
-                cout << (dataText[i][j]=="1" ? "Present" : "Absent");
+            //else if(colName[j]=="Status")
+              //  cout << (dataText[i][j]=="1" ? "Present" : "Absent");
             else
                 cout << dataText[i][j];
 
@@ -195,6 +203,42 @@ void displayCSV() {
     cout << "-------------------------------------------\n";
 }
 
+// Add function to input file here.
+void saveToFile(const string &fileName)
+{
+    ofstream outFile(fileName);
+
+    if (!outFile)
+    {
+        cout << "Error: Could not write to file.\n";
+        return;
+    }
+
+    // Column headers
+    for (int i = 0; i < numCol; i++)
+    {
+        outFile << colName[i];
+        if (i < numCol - 1) outFile << ",";
+    }
+    outFile << "\n";
+
+    // Rows
+    for (int i = 0; i < rowCount; i++)
+    {
+        for (int j = 0; j < numCol; j++)
+        {
+            if (colType[j] == "INT")
+                outFile << dataInt[i][j];
+            else
+                outFile << dataText[i][j];
+
+            if (j < numCol - 1) outFile << ",";
+        }
+        outFile << "\n";
+    }
+    outFile.close();
+}
+
 // Main Menu
 int main() {
     string fileName;    // To hold file name
@@ -203,7 +247,7 @@ int main() {
     int choice = 0;
 
     cout << "===========================================\n";
-    cout << "   STUDENT ATTENDANCE TRACKER - MILESTONE 2\n";
+    cout << " STUDENT ATTENDANCE TRACKER - MILESTONE 2\n";
     cout << "===========================================\n";
 
     cout << "Create School Term (Database)";
@@ -214,18 +258,16 @@ int main() {
     // Open the file for input
     cout << "Database \"" << fileName << "\" created and loaded.\n";
 
-    outFile.open(fileName);
-
     // If the input file was opened successfully, continue.
     if (outFile)
     {
         // Actually. What is you two 'cout' 's purpose?
-        cout << "Reading attendance data from file...\n";
-        cout << "Successfully loaded: Week1_Attendance.csv\n"; // They're not asking me to actually
+        //cout << "Reading attendance data from file...\n";
+        //cout << "Successfully loaded: Week1_Attendance.csv\n"; // They're not asking me to actually
                                                                  // keep track/create the csv right?
 
         cout << "===========================================\n";
-        cout << "   STUDENT ATTENDANCE TRACKER - MILESTONE 1\n";
+        cout << "  STUDENT ATTENDANCE TRACKER - MILESTONE 1\n";
         cout << "===========================================\n";
 
         do {
