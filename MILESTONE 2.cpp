@@ -7,23 +7,26 @@
 
 #include <iostream>
 #include <fstream>
-#include <cctype>   // for isdigit
+#include <cctype>
 using namespace std;
 
 // ===== CONSTANTS =====
-const int MAX_ROW = 100;   // maximum number of students
+const int MAX_ROW = 100;
 
 // ===== STRUCTS =====
 struct Student {
-    int id;        // student ID
-    string name;   // student name
-    int status;    // attendance status (0=absent, 1=present)
+    int id;
+    string name;
+    int status; // 0 = absent, 1 = present
 };
 
 // ===== GLOBAL VARIABLES =====
-Student sheet[MAX_ROW];  // array to store student records
-int rowCount = 0;        // current number of rows
-string termName;         // school term name
+Student sheet[MAX_ROW];
+int rowCount = 0;
+string termName;
+
+bool fileLoaded = false;        // track if a CSV is loaded
+string loadedFileName = "";     // the name of the loaded file
 
 // ===== FUNCTION DECLARATIONS =====
 bool isValidInt(string s);
@@ -37,162 +40,203 @@ void saveFile();
 void menu();
 
 // ===== VALIDATION FUNCTION =====
-// Checks if a string contains only digits
 bool isValidInt(string s){
-    for(char c: s)
+    if(s.empty()) return false;
+    for(char c : s)
         if(!isdigit(c))
             return false;
-    return !s.empty();
+    return true;
 }
 
 // ===== CREATE TERM =====
 void createTerm(){
-    cin.ignore();  // clear input buffer
     cout << "Enter term name: ";
-    getline(cin, termName);
+    string input;
+    getline(cin, input);
+    termName = input;
+
+    rowCount = 0;
+    fileLoaded = false;
+    loadedFileName = "";
+
     cout << "Database \"" << termName << "\" created successfully.\n";
 }
 
-// ===== READ CSV FILE  =====
+// ===== READ CSV FILE =====
 void readFile(){
-    cin.ignore();  // clear input buffer
+    cout << "Enter CSV file name (e.g., FileName.csv): ";
     string fileName;
-    cout << "Enter CSV file name (e.g., Week1_Attendance.csv): ";
     getline(cin, fileName);
 
-    ifstream file(fileName); // open file
+    ifstream file(fileName);
     if(!file){
-        cout << "Error: File \"" << fileName << "\" not found in current folder.\n";
+        cout << "Error: File \"" << fileName << "\" not found.\n";
         return;
     }
 
-    rowCount = 0; // reset row count
+    rowCount = 0;
     string line;
 
     while(getline(file, line)){
-        if(line.empty()) continue; // skip empty lines
+        if(line.empty()) continue;
 
-        // Find commas manually
-        size_t pos1 = line.find(',');      // first comma
-        if(pos1 == string::npos) continue; // invalid row
+        size_t pos1 = line.find(',');
+        size_t pos2 = line.find(',', pos1 + 1);
 
-        size_t pos2 = line.find(',', pos1+1); // second comma
-        if(pos2 == string::npos) continue;    // invalid row
+        if(pos1 == string::npos || pos2 == string::npos)
+            continue;
 
-        // Extract ID, Name, Status
         string idStr = line.substr(0, pos1);
         string nameStr = line.substr(pos1 + 1, pos2 - pos1 - 1);
         string statusStr = line.substr(pos2 + 1);
 
-        // Validate integers
         if(!isValidInt(idStr) || !isValidInt(statusStr)){
             cout << "Skipping invalid row: " << line << endl;
             continue;
         }
 
-        // Store in sheet
         sheet[rowCount].id = stoi(idStr);
         sheet[rowCount].name = nameStr;
         sheet[rowCount].status = stoi(statusStr);
         rowCount++;
 
-        if(rowCount >= MAX_ROW){
-            cout << "Warning: Maximum row limit reached (" << MAX_ROW << ").\n";
+        if(rowCount >= MAX_ROW)
             break;
-        }
     }
 
     file.close();
-    cout << "File \"" << fileName << "\" loaded successfully. Rows read: " << rowCount << endl;
+
+    if(rowCount > 0){
+        fileLoaded = true;
+        loadedFileName = fileName;
+        cout << "File \"" << fileName << "\" loaded successfully. Rows read: "
+             << rowCount << endl;
+    } else {
+        cout << "No valid records found in file.\n";
+    }
 }
 
-// ===== DISPLAY ATTENDANCE SHEET =====
+// ===== DISPLAY =====
 void displaySheet(){
-    if(rowCount == 0){
-        cout << "No records to display.\n";
+    if(!fileLoaded){
+        cout << "Error: No file loaded.\n";
         return;
     }
 
     cout << "\nStudentID, Name, Status\n";
     cout << "------------------------\n";
-    for(int i=0; i<rowCount; i++){
+
+    for(int i = 0; i < rowCount; i++){
         cout << sheet[i].id << ", "
              << sheet[i].name << ", "
              << sheet[i].status << endl;
     }
 }
 
-// ===== UPDATE ATTENDANCE =====
+// ===== UPDATE =====
 void updateRow(){
-    string input;
+    if(!fileLoaded){
+        cout << "Error: No record available for update.Please load file first at option 2.\n";
+        return;
+    }
+
     cout << "Enter StudentID to update: ";
-    cin >> input;
+    string input;
+    getline(cin, input);
 
     if(!isValidInt(input)){
-        cout << "Error: Invalid StudentID. Must be an integer.\n";
+        cout << "Invalid StudentID.\n";
         return;
     }
 
     int id = stoi(input);
-    for(int i=0; i<rowCount; i++){
+    for(int i = 0; i < rowCount; i++){
         if(sheet[i].id == id){
-            int newStatus;
             cout << "Enter new status (0=Absent, 1=Present): ";
-            cin >> newStatus;
-            if(newStatus != 0 && newStatus != 1){
-                cout << "Error: Status must be 0 or 1.\n";
+            string statusInput;
+            getline(cin, statusInput);
+
+            if(!isValidInt(statusInput)){
+                cout << "Invalid status.\n";
                 return;
             }
+
+            int newStatus = stoi(statusInput);
+            if(newStatus != 0 && newStatus != 1){
+                cout << "Status must be 0 or 1.\n";
+                return;
+            }
+
             sheet[i].status = newStatus;
             cout << "Attendance updated successfully.\n";
             return;
         }
     }
-    cout << "Error: StudentID not found.\n";
+
+    cout << "StudentID not found.\n";
 }
 
-// ===== DELETE ROW =====
+// ===== DELETE =====
 void deleteRow(){
-    int id;
-    cout << "Enter StudentID to delete: ";
-    cin >> id;
+    if(!fileLoaded){
+        cout << "Error: No record available for delete.Please load file first at option 2.\n";
+        return;
+    }
 
-    for(int i=0; i<rowCount; i++){
+    cout << "Enter StudentID to delete: ";
+    string input;
+    getline(cin, input);
+
+    if(!isValidInt(input)){
+        cout << "Invalid StudentID.\n";
+        return;
+    }
+
+    int id = stoi(input);
+    for(int i = 0; i < rowCount; i++){
         if(sheet[i].id == id){
-            // Shift remaining rows up
-            for(int j=i; j<rowCount-1; j++)
-                sheet[j] = sheet[j+1];
+            for(int j = i; j < rowCount - 1; j++)
+                sheet[j] = sheet[j + 1];
+
             rowCount--;
             cout << "Student record deleted successfully.\n";
             return;
         }
     }
-    cout << "Error: StudentID not found.\n";
+
+    cout << "StudentID not found.\n";
 }
 
-// ===== COUNT ROWS =====
+// ===== COUNT =====
 void countRows(){
     cout << "Total number of student records: " << rowCount << endl;
 }
 
-// ===== SAVE TO CSV =====
+// ===== SAVE (OVERWRITE ORIGINAL FILE) =====
 void saveFile(){
-    ofstream file("Week1_Attendance_Updated.csv");
-    if(!file){
-        cout << "Error: Could not create output file.\n";
+    if(!fileLoaded){
+        cout << "Error: No attendance file loaded.\n";
         return;
     }
 
-    for(int i=0; i<rowCount; i++){
+    ofstream file(loadedFileName);
+    if(!file){
+        cout << "Error: Could not open file for saving.\n";
+        return;
+    }
+
+    for(int i = 0; i < rowCount; i++){
         file << sheet[i].id << ","
              << sheet[i].name << ","
              << sheet[i].status << "\n";
     }
+
     file.close();
-    cout << "Attendance saved successfully as \"Week1_Attendance_Updated.csv\".\n";
+    cout << "Attendance saved successfully to \""
+         << loadedFileName << "\".\n";
 }
 
-// ===== MENU DISPLAY =====
+// ===== MENU =====
 void menu(){
     cout << "\n========== MENU ==========\n";
     cout << "1. Create School Term\n";
@@ -207,16 +251,25 @@ void menu(){
     cout << "Enter choice: ";
 }
 
-// ===== MAIN FUNCTION =====
+// ===== MAIN =====
 int main(){
     cout << "===========================================\n";
     cout << "   STUDENT ATTENDANCE TRACKER - MILESTONE 2\n";
     cout << "===========================================\n";
 
+    string input;
     int choice;
-    do{
+
+    do {
         menu();
-        cin >> choice;
+        getline(cin, input);
+
+        if(!isValidInt(input)){
+            cout << "Invalid choice. Please enter 1-8.\n";
+            continue;
+        }
+
+        choice = stoi(input);
 
         switch(choice){
             case 1: createTerm(); break;
