@@ -25,8 +25,8 @@ Student sheet[MAX_ROW];
 int rowCount = 0;
 string termName = "";
 
-bool termCreated = false;     // MUST create term first
-bool fileLoaded = false;      // CSV loaded status
+bool termCreated = false;
+bool fileLoaded = false;
 string loadedFileName = "";
 
 // ===== FUNCTION DECLARATIONS =====
@@ -49,17 +49,19 @@ bool isValidInt(string s){
     return true;
 }
 
-// ===== CREATE TERM =====
+// ===== CREATE TERM (FIXED) =====
 void createTerm(){
-    cout << "Enter term name: ";
-    getline(cin, termName);
+    while(true){
+        cout << "Enter term name: ";
+        getline(cin, termName);
 
-    if(termName.empty()){
-        cout << "Error: Term name cannot be empty.\n";
-        return;
+        if(termName.empty()){
+            cout << "Error: Term name cannot be empty. Please try again.\n";
+        } else {
+            break;
+        }
     }
 
-    // Reset all previous data
     rowCount = 0;
     fileLoaded = false;
     loadedFileName = "";
@@ -137,7 +139,7 @@ void displaySheet(){
     for(int i = 0; i < rowCount; i++){
         cout << sheet[i].id << ", "
              << sheet[i].name << ", "
-             << sheet[i].status << endl;
+             << (sheet[i].status == 1 ? "Present" : "Absent") << endl;
     }
 }
 
@@ -296,3 +298,9 @@ int main(){
 
     return 0;
 }
+
+
+   
+
+   
+   
