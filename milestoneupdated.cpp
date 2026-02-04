@@ -49,7 +49,7 @@ bool isValidInt(string s){
     return true;
 }
 
-// ===== CREATE TERM (FIXED) =====
+// ===== CREATE TERM =====
 void createTerm(){
     while(true){
         cout << "Enter term name: ";
@@ -133,13 +133,13 @@ void displaySheet(){
     }
 
     cout << "\nTerm: " << termName << endl;
-    cout << "StudentID, Name, Status\n";
+    cout << "StudentID, Name, Status \n";
     cout << "------------------------\n";
 
     for(int i = 0; i < rowCount; i++){
         cout << sheet[i].id << ", "
              << sheet[i].name << ", "
-             << (sheet[i].status == 1 ? "Present" : "Absent") << endl;
+             << sheet[i].status << endl;
     }
 }
 
@@ -298,9 +298,3 @@ int main(){
 
     return 0;
 }
-
-
-   
-
-   
-   
